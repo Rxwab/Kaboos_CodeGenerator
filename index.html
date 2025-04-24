@@ -22,6 +22,7 @@
     <div class="bg-gray-900 p-8 rounded-xl neon-border max-w-md w-full text-center">
         <h1 class="text-3xl font-bold neon-text mb-4">💀 مولّد كودات هاك كابوس 💀</h1>
         <p class="text-lg mb-6">أدخل إجابات الأسئلة وانتظر 50 ثانية للحصول على كود مؤقت!</p>
+        <p id="userIdDisplay" class="text-lg mb-4 hidden">معرفك: <span id="userId"></span></p>
 
         <!-- اختبار لست روبوت -->
         <div id="captcha" class="mb-6">
@@ -44,6 +45,16 @@
     </div>
 
     <script>
+        // قراءة معرف المستخدم من الرابط
+        const urlParams = new URLSearchParams(window.location.search);
+        let userId = urlParams.get('user');
+        if (!userId) {
+            userId = Math.random().toString(36).substr(2, 10); // توليد معرف عشوائي إذا ما فيش
+            window.history.replaceState({}, '', `?user=${userId}`);
+        }
+        document.getElementById('userId').textContent = userId;
+        document.getElementById('userIdDisplay').classList.remove('hidden');
+
         // أسئلة التحقق
         const questions = [
             { question: "2 × 2 = ?", answer: 4 },
@@ -94,12 +105,12 @@
             codeOutput.textContent = `كودك المؤقت: ${code}`;
             codeOutput.classList.remove('hidden');
 
-            // تخزين الكود مع تاريخ الانتهاء (24 ساعة)
-            const codes = JSON.parse(localStorage.getItem('codes') || '[]');
-            codes.push({
+            // تخزين الكود مع المعرف وتاريخ الانتهاء (24 ساعة)
+            const codes = JSON.parse(localStorage.getItem('codes') || '{}');
+            codes[userId] = {
                 code: code,
                 expires: Date.now() + 24 * 60 * 60 * 1000 // 24 ساعة
-            });
+            };
             localStorage.setItem('codes', JSON.stringify(codes));
 
             // تعطيل الزر بعد التوليد
