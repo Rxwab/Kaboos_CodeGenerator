@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولّد كودات هاك كابوس</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            font-family: 'Arial', sans-serif;
+        }
+        .neon-text {
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+        }
+        .neon-border {
+            box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center text-white">
+    <div class="bg-gray-900 p-8 rounded-xl neon-border max-w-md w-full text-center">
+        <h1 class="text-3xl font-bold neon-text mb-4">💀 مولّد كودات هاك كابوس 💀</h1>
+        <p class="text-lg mb-6">أدخل إجابات الأسئلة وانتظر 50 ثانية للحصول على كود مؤقت!</p>
+
+        <!-- اختبار لست روبوت -->
+        <div id="captcha" class="mb-6">
+            <h2 class="text-xl mb-2">تأكد إنك لست روبوت 🤖</h2>
+            <p id="question" class="text-lg mb-2"></p>
+            <input id="answer" type="number" class="w-full p-2 bg-gray-800 text-white rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="أدخل الإجابة">
+            <button id="verifyCaptcha" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg neon-border">تحقق</button>
+        </div>
+
+        <!-- المؤقت -->
+        <div id="timerSection" class="hidden mb-6">
+            <p class="text-lg">انتظر: <span id="timer">50</span> ثانية</p>
+        </div>
+
+        <!-- زر إنشاء الكود -->
+        <div id="generateSection" class="hidden">
+            <button id="generateCode" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg neon-border" disabled>إنشاء كود مؤقت</button>
+            <p id="codeOutput" class="text-lg mt-4 hidden"></p>
+        </div>
+    </div>
+
+    <script>
+        // أسئلة التحقق
+        const questions = [
+            { question: "2 × 2 = ?", answer: 4 },
+            { question: "4 × 4 = ?", answer: 16 },
+            { question: "3 × 3 = ?", answer: 9 }
+        ];
+
+        // اختيار سؤال عشوائي
+        const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+        document.getElementById('question').textContent = randomQuestion.question;
+
+        // التحقق من الإجابة
+        document.getElementById('verifyCaptcha').addEventListener('click', () => {
+            const answer = parseInt(document.getElementById('answer').value);
+            if (answer === randomQuestion.answer) {
+                document.getElementById('captcha').classList.add('hidden');
+                document.getElementById('timerSection').classList.remove('hidden');
+                startTimer();
+            } else {
+                alert('إجابة خاطئة! حاول مرة أخرى.');
+            }
+        });
+
+        // المؤقت
+        function startTimer() {
+            let timeLeft = 50;
+            const timerElement = document.getElementById('timer');
+            const generateButton = document.getElementById('generateCode');
+            const timerSection = document.getElementById('timerSection');
+            const generateSection = document.getElementById('generateSection');
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    timerSection.classList.add('hidden');
+                    generateSection.classList.remove('hidden');
+                    generateButton.disabled = false;
+                }
+            }, 1000);
+        }
+
+        // توليد كود مؤقت
+        document.getElementById('generateCode').addEventListener('click', () => {
+            const code = `FREE_${Math.random().toString(36).substr(2, 24)}`;
+            const codeOutput = document.getElementById('codeOutput');
+            codeOutput.textContent = `كودك المؤقت: ${code}`;
+            codeOutput.classList.remove('hidden');
+
+            // تخزين الكود مع تاريخ الانتهاء (24 ساعة)
+            const codes = JSON.parse(localStorage.getItem('codes') || '[]');
+            codes.push({
+                code: code,
+                expires: Date.now() + 24 * 60 * 60 * 1000 // 24 ساعة
+            });
+            localStorage.setItem('codes', JSON.stringify(codes));
+
+            // تعطيل الزر بعد التوليد
+            document.getElementById('generateCode').disabled = true;
+        });
+    </script>
+</body>
+</html>
